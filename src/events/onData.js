@@ -1,8 +1,10 @@
 import { config } from '../config/config.js';
 import { PACKET_TYPE } from '../constants/header.js';
 import { packetParser } from '../utils/parser/packetParser.js';
+import { getHandlerById } from '../handlers/index.js';
+import { getUserById } from '../session/user.session.js';
 
-export const onData = (socket) => (data) => {
+export const onData = (socket) => async (data) => {
   socket.buffer = Buffer.concat([socket.buffer, data]);
 
   const totalHeaderLength = config.packet.totalLength + config.packet.typeLength;
@@ -19,7 +21,6 @@ export const onData = (socket) => (data) => {
 
       console.log(`length: ${length}`);
       console.log(`packetType: ${packetType}`);
-      console.log(packet);
 
       switch (packetType) {
         case PACKET_TYPE.PING:
@@ -27,10 +28,13 @@ export const onData = (socket) => (data) => {
         case PACKET_TYPE.NORMAL:
           const { handlerId, userId, sequence, payload } = packetParser(packet);
 
-          console.log(`handlerId: ${handlerId}`);
-          console.log(`userId: ${userId}`);
-          console.log(`sequence: ${sequence}`);
-          console.log(`payload: ${payload}`);
+          const user = getUserById(userId);
+          if (user && user.sequence !== sequence) {
+            console.error('잘못된 호출 값입니다.');
+          }
+
+          const handler = getHandlerById(handlerId);
+          await handler({ socket, userId, payload });
       }
     } else {
       break;
