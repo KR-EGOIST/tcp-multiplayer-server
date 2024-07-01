@@ -67,9 +67,9 @@ export const loadProtos = async () => {
   }
 };
 
-// 로드된 프로토 메시지들의 얕은 복사본을 반환합니다.
-// 원본을 보호하기 위해서 얕은 복사를 한다.
+// 로드된 프로토 메시지들의 깊은 복사본을 반환합니다.
+// 원본을 보호하기 위해서 깊은 복사를 한다.
 export const getProtoMessages = () => {
   // console.log('protoMessages:', protoMessages); // 디버깅을 위해 추가
-  return { ...protoMessages };
+  return Object.freeze(protoMessages);
 };
