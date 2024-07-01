@@ -11,7 +11,7 @@ export const removeUser = (socket) => {
   const index = userSessions.findIndex((user) => user.socket === socket);
 
   if (index !== -1) {
-    userSessions.splice(index, 1);
+    return userSessions.splice(index, 1)[0];
   }
 };
 

@@ -16,7 +16,7 @@ const initialHandler = async ({ socket, userId, payload }) => {
       await updateUserLogin(user.id);
     }
 
-    addUser(user.id, socket);
+    addUser(socket, user.id);
 
     const initialResponse = createResponse(
       HANDLER_IDS.INITIAL,
