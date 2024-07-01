@@ -1,20 +1,9 @@
 import net from 'net';
 import initServer from './init/index.js';
 import { config } from './config/config.js';
+import { onConnection } from './events/onConnection.js';
 
-const server = net.createServer((socket) => {
-  socket.on('data', (data) => {
-    console.log(data);
-  });
-
-  socket.on('end', () => {
-    console.log('클라이언트와 연결이 끊겼습니다.');
-  });
-
-  socket.on('error', (error) => {
-    console.error('소켓 에러:', error);
-  });
-});
+const server = net.createServer(onConnection);
 
 initServer()
   .then(() => {
