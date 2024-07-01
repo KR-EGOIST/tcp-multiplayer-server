@@ -1,4 +1,5 @@
 import net from 'net';
+import { getProtoMessages, loadProtos } from './src/init/loadProtos.js';
 
 const TOTAL_LENGTH = 4;
 const PACKET_TYPE_LENGTH = 1;
@@ -10,12 +11,25 @@ const readHeader = (buffer) => {
   };
 };
 
-const writeHeader = (length, packetType) => {
-  const headerSize = TOTAL_LENGTH + PACKET_TYPE_LENGTH;
-  const buffer = Buffer.alloc(headerSize);
-  buffer.writeUInt32BE(length + headerSize, 0);
-  buffer.writeInt8(packetType, TOTAL_LENGTH);
-  return buffer;
+const sendPacket = (socket, packet) => {
+  const protoMessages = getProtoMessages();
+  const Packet = protoMessages.common.Packet;
+  if (!Packet) {
+    console.error('Packet 메시지를 찾을 수 없습니다.');
+    return;
+  }
+
+  const buffer = Packet.encode(packet).finish();
+
+  const packetLength = Buffer.alloc(TOTAL_LENGTH);
+  packetLength.writeUInt32BE(buffer.length + TOTAL_LENGTH + PACKET_TYPE_LENGTH, 0);
+
+  const packetType = Buffer.alloc(PACKET_TYPE_LENGTH);
+  packetType.writeInt8(1, 0);
+
+  const packetWithLength = Buffer.concat([packetLength, packetType, buffer]);
+
+  socket.write(packetWithLength);
 };
 
 const HOST = 'localhost';
@@ -23,15 +37,19 @@ const PORT = 3000;
 
 const client = new net.Socket();
 
-client.connect(PORT, HOST, () => {
+client.connect(PORT, HOST, async () => {
   console.log('서버와 연결되었습니다.');
+  await loadProtos();
 
-  const message = 'Hi, There!';
-  const test = Buffer.from(message);
+  const message = {
+    handlerId: 2,
+    userId: 'xyz',
+    clientVersion: '1.0.0',
+    sequence: 0,
+    payload: {},
+  };
 
-  const header = writeHeader(test.length, 11);
-  const packet = Buffer.concat([header, test]);
-  client.write(packet);
+  sendPacket(client, message);
 });
 
 client.on('data', (data) => {
