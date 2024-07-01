@@ -1,15 +1,16 @@
 import mysql from 'mysql2/promise';
 import { config } from '../config/config.js';
-import formatDate from '../utils/dateFomatter.js';
+import formatDate from '../utils/dateFormatter.js';
 
 const { databases } = config;
 
 const createPool = (dbConfig) => {
   const pool = mysql.createPool({
     host: dbConfig.host,
+    port: dbConfig.port,
     user: dbConfig.user,
     password: dbConfig.password,
-    database: dbConfig.database,
+    database: dbConfig.name,
     // 커넥션 풀이 10개인데 10개의 요청이 들어와서 커넥션 풀이 가득 찼을 경우 그 다음 들어오는 요청은 어떻게 처리할까라는 의미
     // waitFor 이므로 이미 있는 10개 요청 중 어느 하나가 끝날 때까지 해당 요청은 대기열에서 기다리겠다.
     waitForConnections: true,
@@ -21,11 +22,8 @@ const createPool = (dbConfig) => {
 
   pool.query = (sql, params) => {
     const date = new Date();
-
     console.log(
-      `[${formatDate(date)}] Executing query: ${sql} ${
-        params ? `, ${JSON.stringify(params)}` : ``
-      }`,
+      `[${formatDate(date)}] 실행중인 쿼리: ${sql} ${params ? `, ${JSON.stringify(params)}` : ``}`,
     );
 
     return originalQuery.call(pool, sql, params);
