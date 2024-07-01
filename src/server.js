@@ -1,11 +1,8 @@
 import net from 'net';
 import initServer from './init/index.js';
-
-const PORT = 3000;
+import { config } from './config/config.js';
 
 const server = net.createServer((socket) => {
-  console.log(`클라이언트와 연결되었습니다: ${socket.remoteAddress}:${socket.remotePort}`);
-
   socket.on('data', (data) => {
     console.log(data);
   });
@@ -21,8 +18,8 @@ const server = net.createServer((socket) => {
 
 initServer()
   .then(() => {
-    server.listen(PORT, () => {
-      console.log(`서버가 ${PORT} 포트로 연결되었습니다.`);
+    server.listen(config.server.port, config.server.host, () => {
+      console.log(`서버가 ${config.server.host}:${config.server.port}에서 실행 중입니다.`);
       console.log(server.address());
     });
   })
