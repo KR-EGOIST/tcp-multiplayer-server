@@ -2,11 +2,21 @@ syntax = "proto3";
 
 package game;
 
+// 게임 생성 핸들러 payload
 message CreateGamePayload {
-  int64 timestamp = 1;       // 게임 생성 시각
+  int64 timestamp = 1;       // 게임 생성 시간
 }
 
+// 게임 참가 핸들러 payload
 message JoinGamePayload {
   string gameId = 1;         // 게임 ID (UUID)
-  int64 timestamp = 2;       // 게임 참가 시각
+  int64 timestamp = 2;       // 게임 참가 시간
+}
+
+// 위치 정보 업데이트
+// 지금 내가 어떤 게임에 있는지와 나의 위치를 보낸다.
+message LocationUpdatePayload {
+  string gameId = 1;  // 게임 ID (UUID)
+  float x = 2;  // 유저의 x 위치 
+  float y = 3;  // 유저의 y 위치 
 }

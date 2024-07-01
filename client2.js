@@ -1,13 +1,16 @@
 import net from 'net';
+import Long from 'long';
 import { getProtoMessages, loadProtos } from './src/init/loadProtos.js';
 
 const TOTAL_LENGTH = 4; // 전체 길이를 나타내는 4바이트
 const PACKET_TYPE_LENGTH = 1; // 패킷타입을 나타내는 1바이트
 
 let userId;
-let sequence;
+let gameId = '9d5f0383-5cc7-40bd-95b0-f917ecdbf451';
+let sequence = 0;
 const deviceId = 'xxxxx';
-let gameId = '7f1dcfd8-a7bb-4fed-9428-a9891c34c397';
+let x = 0.0;
+let y = 0.0;
 
 const createPacket = (handlerId, payload, clientVersion = '1.0.0', type, name) => {
   const protoMessages = getProtoMessages();
@@ -24,7 +27,7 @@ const createPacket = (handlerId, payload, clientVersion = '1.0.0', type, name) =
     handlerId,
     userId,
     clientVersion,
-    sequence: 0,
+    sequence,
     payload: payloadBuffer,
   };
 };
@@ -41,7 +44,7 @@ const sendPacket = (socket, packet) => {
 
   // 패킷 길이 정보를 포함한 버퍼 생성
   const packetLength = Buffer.alloc(TOTAL_LENGTH);
-  packetLength.writeUInt32BE(buffer.length + TOTAL_LENGTH + PACKET_TYPE_LENGTH, 0); // 패킷 길이에 타입 바이트 포함
+  packetLength.writeUInt32BE(buffer.length + TOTAL_LENGTH + PACKET_TYPE_LENGTH, 0);
 
   // 패킷 타입 정보를 포함한 버퍼 생성
   const packetType = Buffer.alloc(PACKET_TYPE_LENGTH);
@@ -53,6 +56,33 @@ const sendPacket = (socket, packet) => {
   socket.write(packetWithLength);
 };
 
+const sendPong = (socket, timestamp) => {
+  const protoMessages = getProtoMessages();
+  const Ping = protoMessages.common.Ping;
+
+  const pongMessage = Ping.create({ timestamp });
+  const pongBuffer = Ping.encode(pongMessage).finish();
+  // 패킷 길이 정보를 포함한 버퍼 생성
+  const packetLength = Buffer.alloc(TOTAL_LENGTH);
+  packetLength.writeUInt32BE(pongBuffer.length + TOTAL_LENGTH + PACKET_TYPE_LENGTH, 0);
+
+  // 패킷 타입 정보를 포함한 버퍼 생성
+  const packetType = Buffer.alloc(PACKET_TYPE_LENGTH);
+  packetType.writeUInt8(0, 0);
+
+  // 길이 정보와 메시지를 함께 전송
+  const packetWithLength = Buffer.concat([packetLength, packetType, pongBuffer]);
+
+  socket.write(packetWithLength);
+};
+
+const updateLocation = (socket) => {
+  x += 1;
+  const packet = createPacket(6, { gameId, x, y }, '1.0.0', 'game', 'LocationUpdatePayload');
+
+  sendPacket(socket, packet);
+};
+
 // 서버에 연결할 호스트와 포트
 const HOST = 'localhost';
 const PORT = 3000;
@@ -60,6 +90,10 @@ const PORT = 3000;
 const client = new net.Socket();
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+process.on('SIGINT', () => {
+  client.end(() => process.exit(0));
+});
 
 client.connect(PORT, HOST, async () => {
   console.log('Connected to server');
@@ -81,17 +115,16 @@ client.connect(PORT, HOST, async () => {
   await sendPacket(client, createGamePacket);
 });
 
-client.on('data', (data) => {
+client.on('data', async (data) => {
   // 1. 길이 정보 수신 (4바이트)
   const length = data.readUInt32BE(0);
   const totalHeaderLength = TOTAL_LENGTH + PACKET_TYPE_LENGTH;
-
   // 2. 패킷 타입 정보 수신 (1바이트)
   const packetType = data.readUInt8(4);
   const packet = data.slice(totalHeaderLength, totalHeaderLength + length); // 패킷 데이터
+  const protoMessages = getProtoMessages();
 
   if (packetType === 1) {
-    const protoMessages = getProtoMessages();
     const Response = protoMessages.response.Response;
 
     try {
@@ -105,6 +138,49 @@ client.on('data', (data) => {
     } catch (e) {
       console.log(e);
     }
+  } else if (packetType === 0) {
+    try {
+      const Ping = protoMessages.common.Ping;
+      const pingMessage = Ping.decode(packet);
+      const timestampLong = new Long(
+        pingMessage.timestamp.low,
+        pingMessage.timestamp.high,
+        pingMessage.timestamp.unsigned,
+      );
+      // console.log('Received ping with timestamp:', timestampLong.toNumber());
+      // 1초의 레이턴시를 가지고 PingPong패킷을 왔다 갔다 합니다.
+      // 그러면 라운드 트립 레이턴시로 계산하면 500? 1000?
+      await delay(1000);
+      await sendPong(client, timestampLong.toNumber());
+    } catch (pongError) {
+      console.error('Ping 처리 중 오류 발생:', pongError);
+    }
+  } else if (packetType === 2) {
+    try {
+      const Start = protoMessages.gameNotification.Start;
+      const startMessage = Start.decode(packet);
+
+      console.log('응답 데이터:', startMessage);
+      if (startMessage.gameId) {
+        gameId = startMessage.gameId;
+      }
+
+      // 위치 업데이트 패킷 전송
+      setInterval(() => {
+        updateLocation(client);
+      }, 1000);
+    } catch (error) {
+      console.error(error);
+    }
+  } else if (packetType === 3) {
+    try {
+      const locationUpdate = protoMessages.gameNotification.LocationUpdate;
+      const locationUpdateMessage = locationUpdate.decode(packet);
+
+      console.log('응답 데이터:', locationUpdateMessage);
+    } catch (error) {
+      console.error(error);
+    }
   }
 });
 
@@ -115,11 +191,3 @@ client.on('close', () => {
 client.on('error', (err) => {
   console.error('Client error:', err);
 });
-
-process.on('SIGINT', () => {
-  client.end('클라이언트가 종료됩니다.', () => {
-    process.exit(0);
-  });
-});
-
-process.on('SIGINT', () => client.end(() => process.exit(0)));

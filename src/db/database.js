@@ -1,9 +1,10 @@
 import mysql from 'mysql2/promise';
 import { config } from '../config/config.js';
-import formatDate from '../utils/dateFormatter.js';
+import { formatDate } from '../utils/dateFormatter.js';
 
 const { databases } = config;
 
+// 데이터베이스 커넥션 풀 생성 함수
 const createPool = (dbConfig) => {
   const pool = mysql.createPool({
     host: dbConfig.host,
@@ -20,18 +21,20 @@ const createPool = (dbConfig) => {
 
   const originalQuery = pool.query;
 
+  // pool.query 오버라이딩
   pool.query = (sql, params) => {
     const date = new Date();
+    // 쿼리 실행시 로그
     console.log(
       `[${formatDate(date)}] 실행중인 쿼리: ${sql} ${params ? `, ${JSON.stringify(params)}` : ``}`,
     );
-
     return originalQuery.call(pool, sql, params);
   };
 
   return pool;
 };
 
+// 여러 데이터베이스 커넥션 풀 생성
 const pools = {
   GAME_DB: createPool(databases.GAME_DB),
   USER_DB: createPool(databases.USER_DB),

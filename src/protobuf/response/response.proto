@@ -1,7 +1,11 @@
+// proto 몇 버전일 거냐?
 syntax = "proto3";
 
+// 패킷 이름
+// 아래의 패킷 구조를 묶는 전체적인 최상위 이름
 package response;
 
+// 공통 응답 메시지 구조
 message Response {
   uint32 handlerId = 1;      // 핸들러 ID
   uint32 responseCode = 2;   // 응답 코드 (성공: 0, 실패: 에러 코드)
