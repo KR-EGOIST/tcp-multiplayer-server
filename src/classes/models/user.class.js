@@ -1,14 +1,16 @@
 import { createPingPacket } from '../../utils/notification/game.notification.js';
 
 class User {
-  constructor(id, socket) {
+  constructor(id, socket, deviceId, playerId, latency) {
     this.id = id;
     this.socket = socket;
+    this.deviceId = deviceId;
+    this.playerId = playerId;
+    this.latency = latency;
     this.x = 0;
     this.y = 0;
     this.sequence = 0; // 호출 횟수
     this.lastUpdateTime = Date.now();
-    this.latency = 0;
   }
 
   updatePosition(x, y) {
@@ -39,8 +41,8 @@ class User {
 
   // 추측항법을 사용하여 위치를 추정하는 메서드
   // 본인의 x, y위치는 각 user 클래스마다 가지고 있으므로 각자 계산한 뒤 나중에 모아서 보내면 된다.
-  calculatePosition(latency) {
-    const timeDiff = latency / 1000; // 레이턴시(ms)를 초(s) 단위로 계산
+  calculatePosition() {
+    const timeDiff = this.latency / 1000; // 레이턴시(ms)를 초(s) 단위로 계산
     const speed = 1; // 속도 고정, 초 당 1씩 움직이는 것이라고 가정
     // distance(거리) = speed(속도) * timeDiff(시간)
     const distance = speed * timeDiff;
