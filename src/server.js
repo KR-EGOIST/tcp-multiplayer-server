@@ -1,9 +1,7 @@
 import net from 'net';
-import initServer from './init/index.js';
+import { initServer } from './init/index.js';
 import { config } from './config/config.js';
 import { onConnection } from './event/onConnection.js';
-
-const PORT = 5555;
 
 const server = net.createServer(onConnection);
 
