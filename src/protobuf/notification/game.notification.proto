@@ -12,13 +12,8 @@ message LocationUpdate {
 
   message UserLocation {
     string id = 1;  // 유저 id
-    float x = 2;    // 유저의 x 좌표
-    float y = 3;    // 유저의 y 좌표
+    uint32 playerId = 2;
+    float x = 3;    // 유저의 x 좌표
+    float y = 4;    // 유저의 y 좌표
   }
-}
-
-// 게임 시작 알림
-message Start {
-  string gameId = 1;  // 어떤 게임이 시작되었는지 알아야하므로 gameId를 보낸다.
-  int64 timestamp = 2;  // 게임이 시작하는 시간
 }
