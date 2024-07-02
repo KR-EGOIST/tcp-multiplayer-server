@@ -18,6 +18,10 @@ class User {
     this.lastUpdateTime = Date.now();
   }
 
+  getPosition() {
+    return { x: this.x, y: this.y };
+  }
+
   ping() {
     const now = Date.now();
 

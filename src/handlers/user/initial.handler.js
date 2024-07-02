@@ -19,7 +19,7 @@ const initialHandler = async ({ socket, userId, payload }) => {
       await updateUserLogin(user.id);
     }
 
-    addUser(socket, user.id, deviceId, playerId, latency);
+    addUser(user.id, socket, deviceId, playerId, latency);
 
     user = getUserBydeviceId(deviceId);
     const gameSession = getGameSession(gameId);
@@ -27,6 +27,10 @@ const initialHandler = async ({ socket, userId, payload }) => {
       throw new CustomError(ErrorCodes.GAME_NOT_FOUND, '게임 세션을 찾을 수 없습니다.');
     }
     gameSession.addUser(user);
+    // const existUser = gameSession.getUser(user.id);
+    // if (!existUser) {
+    //   gameSession.addUser(user);
+    // }
 
     // 유저 정보 응답 생성
     const initialResponse = createResponse(

@@ -21,7 +21,7 @@ const locationUpdateHandler = ({ socket, userId, payload }) => {
     user.updatePosition(x, y);
 
     // 완료된 패킷을 보낸다.
-    const packet = gameSession.getAllLocation();
+    const packet = gameSession.getAllLocation(userId);
 
     // 모든 유저의 위치 정보를 보낸다.
     socket.write(packet);
