@@ -1,5 +1,4 @@
 import { getProtoMessages } from '../../init/loadProtos.js';
-import { getNextSequence } from '../../session/user.session.js';
 import { config } from '../../config/config.js';
 import { PACKET_TYPE } from '../../constants/header.js';
 
@@ -12,7 +11,6 @@ export const createResponse = (handlerId, responseCode, data = null, userId) => 
     responseCode,
     timestamp: Date.now(), // 끝나는 시점
     data: data ? Buffer.from(JSON.stringify(data)) : null, // 데이터가 있으면 버퍼 객체 안에 넣어서 보낸다.
-    sequence: userId ? getNextSequence(userId) : 0, // sequence 호출 수를 체크 안하는 것도 있을 수 있다라고 가정
   };
 
   // finish를 꼭 써줘야 한다. 사용방법이라서

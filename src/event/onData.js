@@ -44,12 +44,11 @@ export const onData = (socket) => async (data) => {
             }
             break;
           case PACKET_TYPE.NORMAL:
-            const { handlerId, userId, payload, sequence } = packetParser(packet);
+            const { handlerId, userId, payload } = packetParser(packet);
 
             const user = getUserById(userId);
-            // 유저가 접속해 있는 상황에서 시퀀스 검증, 시퀀스는 호출 횟수
-            if (user && user.sequence !== sequence) {
-              throw new CustomError(ErrorCodes.INVALID_SEQUENCE, '잘못된 호출 값입니다. ');
+            if (!user && handlerId != 0) {
+              throw new CustomError(ErrorCodes.USER_NOT_FOUND, '유저를 찾을 수 없습니다.');
             }
 
             const handler = getHandlerById(handlerId);
