@@ -20,7 +20,6 @@ export const packetParser = (data) => {
   const handlerId = packet.handlerId;
   const userId = packet.userId;
   const clientVersion = packet.clientVersion;
-  const sequence = packet.sequence;
 
   // clientVersion 검증
   if (clientVersion !== config.client.version) {
@@ -46,16 +45,6 @@ export const packetParser = (data) => {
     throw new CustomError(ErrorCodes.PACKET_DECODE_ERROR, '패킷 디코딩 중 오류가 발생했습니다.');
   }
 
-  // 필드 검증 추가
-  // 위의 decode 과정에서 verify 하는 과정이 포함되어 있어서 굳이 또 검증할 필요는 없다.
-  // const errorMessage = PayloadType.verify(payload);
-  // if (errorMessage) {
-  //   throw new CustomError(
-  //     ErrorCodes.INVALID_PACKET,
-  //     `패킷 구조가 일치하지 않습니다: ${errorMessage}`,
-  //   );
-  // }
-
   // 필드가 비어 있거나, 필수 필드가 누락된 경우 처리
   const expectedFields = Object.keys(PayloadType.fields); // fields 는 .proto 의 handlerId, userId, deviceId 등등
   const actualFields = Object.keys(payload);
@@ -67,5 +56,5 @@ export const packetParser = (data) => {
     );
   }
 
-  return { handlerId, userId, payload, sequence };
+  return { handlerId, userId, payload };
 };
