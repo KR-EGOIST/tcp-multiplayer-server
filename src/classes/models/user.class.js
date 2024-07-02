@@ -24,7 +24,7 @@ class User {
   ping() {
     const now = Date.now();
 
-    console.log(`[${this.id}] ping`);
+    // console.log(`[${this.id}] ping`);
     this.socket.write(createPingPacket(now));
   }
 
@@ -34,7 +34,7 @@ class User {
     // 나누기 2 인 이유는 왕복이라서
     // 즉, 이 부분은 서버에서 클라로 이동하는 시간만 계산해서 보내는거라 나누기 2를 한 것이다.
     this.latency = (now - data.timestamp) / 2;
-    console.log(`Received pong from user ${this.id} at ${now} with latency ${this.latency}ms`);
+    // console.log(`Received pong from user ${this.id} at ${now} with latency ${this.latency}ms`);
   }
 
   // 추측항법을 사용하여 위치를 추정하는 메서드
