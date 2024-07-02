@@ -8,7 +8,7 @@ export const packetParser = (data) => {
   const protoMessages = getProtoMessages();
 
   // 공통 패킷 구조를 디코딩
-  const Packet = protoMessages.common.Packet;
+  const Packet = protoMessages.common.CommonPacket;
   let packet;
   try {
     // .decode 내장 메서드를 통해서 data (바이트 배열)을 할당한다.
@@ -19,10 +19,10 @@ export const packetParser = (data) => {
 
   const handlerId = packet.handlerId;
   const userId = packet.userId;
-  const clientVersion = packet.clientVersion;
+  const version = packet.version;
 
-  // clientVersion 검증
-  if (clientVersion !== config.client.version) {
+  // version 검증
+  if (version !== config.client.version) {
     throw new CustomError(
       ErrorCodes.CLIENT_VERSION_MISMATCH,
       '클라이언트 버전이 일치하지 않습니다.',

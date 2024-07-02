@@ -10,7 +10,7 @@ import locationUpdateHandler from './game/locationUpdate.handler.js';
 const handlers = {
   [HANDLER_IDS.INITIAL]: {
     handler: initialHandler,
-    protoType: 'initial.InitialPacket',
+    protoType: 'initial.InitialPayload',
   },
   [HANDLER_IDS.UPDATE_LOCATION]: {
     handler: locationUpdateHandler,

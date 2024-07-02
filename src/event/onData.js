@@ -1,12 +1,13 @@
 import { config } from '../config/config.js';
 import { PACKET_TYPE } from '../constants/header.js';
 import { getHandlerById } from '../handlers/index.js';
-import { getUserById, getUserBySocket } from '../session/user.session.js';
+import { getUserBydeviceId, getUserBySocket } from '../session/user.session.js';
 import CustomError from '../utils/error/customError.js';
 import { ErrorCodes } from '../utils/error/errorCodes.js';
 import { handlerError } from '../utils/error/errorHandler.js';
 import { packetParser } from '../utils/parser/packetParser.js';
 import { getProtoMessages } from '../init/loadProtos.js';
+import { findUserByDeviceID } from '../db/user/user.db.js';
 
 export const onData = (socket) => async (data) => {
   // 기존 버퍼에 새로 수신된 데이터를 추가
@@ -38,18 +39,13 @@ export const onData = (socket) => async (data) => {
               const pingMessage = Ping.decode(packet);
               const user = getUserBySocket(socket);
               if (!user) {
-                throw new CustomError(ErrorCodes.USER_NOT_FOUND, '유저를 찾을 수 없습니다.');
+                throw new CustomError(ErrorCodes.USER_NOT_FOUND, '1유저를 찾을 수 없습니다.');
               }
               user.handlePong(pingMessage);
             }
             break;
           case PACKET_TYPE.NORMAL:
             const { handlerId, userId, payload } = packetParser(packet);
-
-            const user = getUserById(userId);
-            if (!user && handlerId != 0) {
-              throw new CustomError(ErrorCodes.USER_NOT_FOUND, '유저를 찾을 수 없습니다.');
-            }
 
             const handler = getHandlerById(handlerId);
 

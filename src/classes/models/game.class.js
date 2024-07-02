@@ -28,7 +28,7 @@ class Game {
   // user 가 없으면 undefined 가 반환됨
   // user 가 있을 때만 확인을 해라
   getUser(userId) {
-    return this.users.find((user) => user.id === userId);
+    return this.users.find((user) => user.deviceId === userId);
   }
 
   removeUser(userId) {
