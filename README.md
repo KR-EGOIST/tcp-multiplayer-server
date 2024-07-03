@@ -27,7 +27,7 @@ npm install -D nodemon prettier
 
 ## 📄 패킷 구조
 
-### [패킷 구조]
+### [패킷 구조](https://industrious-lasagna-717.notion.site/Node-js-5f01dba6de4646ac8f31d6d95d55cb6c?pvs=4)
 
 ## 📃 ERD Diagram
 
