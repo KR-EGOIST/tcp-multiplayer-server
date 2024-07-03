@@ -11,6 +11,8 @@ import { ErrorCodes } from '../../utils/error/errorCodes.js';
 const initialHandler = async ({ socket, userId, payload }) => {
   try {
     const { deviceId, playerId, latency } = payload;
+
+    // user 테이블 (id, device_id, x, y, last_login)
     let user = await findUserByDeviceID(deviceId);
 
     if (!user) {
@@ -19,8 +21,9 @@ const initialHandler = async ({ socket, userId, payload }) => {
       await updateUserLogin(user.id);
     }
 
-    addUser(user.id, socket, deviceId, playerId, latency);
+    addUser(user.id, socket, deviceId, playerId, latency, user.x, user.y);
 
+    // userSession에서 조회한 user 데이터 (클래스)
     user = getUserBydeviceId(deviceId);
     const gameSession = getGameSession(gameId);
     if (!gameSession) {
@@ -36,7 +39,7 @@ const initialHandler = async ({ socket, userId, payload }) => {
     const initialResponse = createResponse(
       HANDLER_IDS.INITIAL,
       RESPONSE_SUCCESS_CODE,
-      { userId: user.id },
+      { userId: user.id, x: user.x, y: user.y },
       deviceId,
     );
 
