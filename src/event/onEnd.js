@@ -8,8 +8,7 @@ export const onEnd = (socket) => async () => {
   console.log('클라이언트 연결이 종료되었습니다.');
 
   const user = getUserBySocket(socket);
-  const { x, y } = user.getPosition();
-  await updateUserLocation(x, y, user.id);
+  await updateUserLocation(user.x, user.y, user.id);
 
   const gameSession = getGameSession(gameId);
   gameSession.removeUser(user.id);
