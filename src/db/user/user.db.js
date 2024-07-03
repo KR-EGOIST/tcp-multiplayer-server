@@ -24,3 +24,7 @@ export const createUser = async (deviceId) => {
 export const updateUserLogin = async (id) => {
   await pools.USER_DB.query(SQL_QUERIES.UPDATE_USER_LOGIN, [id]);
 };
+
+export const updateUserLocation = async (x, y, id) => {
+  await pools.USER_DB.query(SQL_QUERIES.UPDATE_USER_LOCATION, [x, y, id]);
+};
