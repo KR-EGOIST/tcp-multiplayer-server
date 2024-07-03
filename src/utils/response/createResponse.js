@@ -2,15 +2,22 @@ import { getProtoMessages } from '../../init/loadProtos.js';
 import { config } from '../../config/config.js';
 import { PACKET_TYPE } from '../../constants/header.js';
 
-export const createResponse = (handlerId, responseCode, data = null, userId) => {
+export const createResponse = (handlerId, responseCode, data = null, userId, initData = false) => {
   const protoMessages = getProtoMessages();
   const Response = protoMessages.response.Response;
+
+  let encodedData = data ? Buffer.from(JSON.stringify(data)) : null;
+
+  if (initData) {
+    let initlocation = protoMessages.initlocation.InitUserLocation;
+    encodedData = initlocation.encode(data).finish();
+  }
 
   const responsePayload = {
     handlerId,
     responseCode,
     timestamp: Date.now(), // 끝나는 시점
-    data: data ? Buffer.from(JSON.stringify(data)) : null, // 데이터가 있으면 버퍼 객체 안에 넣어서 보낸다.
+    data: encodedData, // 데이터가 있으면 버퍼 객체 안에 넣어서 보낸다.
   };
 
   // finish를 꼭 써줘야 한다. 사용방법이라서

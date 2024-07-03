@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package initlocation;
+
+message InitUserLocation {
+  string deviceId = 1;  // 디바이스 ID
+  float x = 2;          // 유저의 x 위치 
+  float y = 3;          // 유저의 y 위치 
+}

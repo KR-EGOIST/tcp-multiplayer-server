@@ -13,6 +13,9 @@ export const packetNames = {
   response: {
     Response: 'response.Response',
   },
+  initlocation: {
+    InitUserLocation: 'initlocation.InitUserLocation',
+  },
   gameNotification: {
     LocationUpdate: 'gameNotification.LocationUpdate',
   },

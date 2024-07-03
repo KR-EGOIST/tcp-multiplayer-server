@@ -41,6 +41,7 @@ const initialHandler = async ({ socket, userId, payload }) => {
       RESPONSE_SUCCESS_CODE,
       { userId: user.id, x: user.x, y: user.y },
       deviceId,
+      true,
     );
 
     // 뭔가 처리가 끝났을 때 보내는 것
