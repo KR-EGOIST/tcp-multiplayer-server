@@ -31,7 +31,7 @@ npm install -D nodemon prettier
 
 ## 📃 ERD Diagram
 
-[사진]
+![Untitled](https://github.com/KR-EGOIST/tcp-multiplayer-server/assets/54177070/7130d297-d2dd-4977-a91d-20d75ccb71dc)
 
 ## ⚽ 프로젝트 주요 기능
 
