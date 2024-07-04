@@ -19,7 +19,6 @@ const locationUpdateHandler = ({ socket, userId, payload }) => {
     }
     // 유저의 위치를 업데이트 한다, user 는 User 클래스이므로 User 클래스의 메서드를 사용할 수 있다.
     user.updatePosition(x, y);
-
     // 완료된 패킷을 보낸다.
     const packet = gameSession.getAllLocation(userId);
 

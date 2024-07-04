@@ -9,12 +9,14 @@ class User {
     this.latency = latency;
     this.x = x;
     this.y = y;
+    this.directionX = 0;
+    this.directionY = 0;
     this.lastUpdateTime = Date.now();
   }
 
   updatePosition(x, y) {
-    this.x = x;
-    this.y = y;
+    this.directionX = x;
+    this.directionY = y;
     this.lastUpdateTime = Date.now();
   }
 
@@ -24,32 +26,28 @@ class User {
 
   ping() {
     const now = Date.now();
-
-    // console.log(`[${this.id}] ping`);
     this.socket.write(createPingPacket(now));
   }
 
   handlePong(data) {
     const now = Date.now();
-    // (현재 시간 - 받은 데이터의 시간) / 2
-    // 나누기 2 인 이유는 왕복이라서
-    // 즉, 이 부분은 서버에서 클라로 이동하는 시간만 계산해서 보내는거라 나누기 2를 한 것이다.
     this.latency = (now - data.timestamp) / 2;
-    // console.log(`Received pong from user ${this.id} at ${now} with latency ${this.latency}ms`);
   }
 
   // 추측항법을 사용하여 위치를 추정하는 메서드
   // 본인의 x, y위치는 각 user 클래스마다 가지고 있으므로 각자 계산한 뒤 나중에 모아서 보내면 된다.
   calculatePosition() {
     const timeDiff = this.latency / 1000; // 레이턴시(ms)를 초(s) 단위로 계산
-    const speed = 1; // 속도 고정, 초 당 1씩 움직이는 것이라고 가정
+    const speed = 3; // 클라이언트의 속도가 3으로 설정되어있음
+    const frame = 1 / 60;
     // distance(거리) = speed(속도) * timeDiff(시간)
-    const distance = speed * timeDiff;
+    const distance = speed * frame + speed * frame * timeDiff;
 
-    // x, y 축에서 이동한 거리 계산
-    // 지금은 x 축으로만 움직인다고 가정
+    this.x = this.x + distance * this.directionX;
+    this.y = this.y + distance * this.directionY;
+
     return {
-      x: this.x + distance,
+      x: this.x,
       y: this.y,
     };
   }

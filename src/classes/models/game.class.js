@@ -1,7 +1,5 @@
 import { createLocationPacket } from '../../utils/notification/game.notification.js';
 
-const MAX_PLAYERS = 2;
-
 class Game {
   constructor(id) {
     this.id = id; // 유저 id
@@ -10,9 +8,6 @@ class Game {
   }
 
   addUser(user) {
-    if (this.users.length >= MAX_PLAYERS) {
-      throw new Error('Game session is full');
-    }
     this.users.push(user);
   }
 
@@ -24,10 +19,6 @@ class Game {
 
   removeUser(userId) {
     this.users = this.users.filter((user) => user.id !== userId);
-
-    if (this.users.length < MAX_PLAYERS) {
-      this.state = 'waiting';
-    }
   }
 
   // getMaxLatency() {
@@ -42,13 +33,11 @@ class Game {
   getAllLocation(userId) {
     // const maxLatency = this.getMaxLatency(); // 전체 유저의 최대 레이턴시 구하기
 
-    const locationData = this.users
-      .filter((user) => user.deviceId !== userId)
-      .map((user) => {
-        // const { x, y } = user.calculatePosition(maxLatency);
-        const { x, y } = user.getPosition();
-        return { id: user.deviceId, playerId: user.playerId, x, y };
-      });
+    const locationData = this.users.map((user) => {
+      const { x, y } = user.calculatePosition();
+      // const { x, y } = user.getPosition();
+      return { id: user.deviceId, playerId: user.playerId, x, y };
+    });
     return createLocationPacket(locationData);
   }
 }
