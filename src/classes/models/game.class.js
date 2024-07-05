@@ -33,11 +33,13 @@ class Game {
   getAllLocation(userId) {
     // const maxLatency = this.getMaxLatency(); // 전체 유저의 최대 레이턴시 구하기
 
-    const locationData = this.users.map((user) => {
-      const { x, y } = user.calculatePosition();
-      // const { x, y } = user.getPosition();
-      return { id: user.deviceId, playerId: user.playerId, x, y };
-    });
+    const locationData = this.users
+      .filter((user) => user.deviceId !== userId)
+      .map((user) => {
+        const { x, y } = user.calculatePosition();
+        // const { x, y } = user.getPosition();
+        return { id: user.deviceId, playerId: user.playerId, x, y };
+      });
     return createLocationPacket(locationData);
   }
 }
