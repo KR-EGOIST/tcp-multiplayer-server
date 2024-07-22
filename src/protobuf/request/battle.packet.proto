@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package battle;
+
+// 입장한 던전의 정보, 몬스터 정보
+message DungeonInfo {
+  int32 dungeonCode = 1;
+  repeated MonsterStatus monsters = 2;
+}
+
+// 던전의 입장, 결과를 출력하거나 원하는 다이얼로그 등을 표시
+message ScreenText{
+  string msg = 1;
+  bool typingAnimation = 2;
+  optional ScreenTextAlignment alignment = 3;
+  optional Color textColor = 4;
+  optional Color screenColor = 5;
+}
+
+// 메시지 출력이 완료된 후 화면 클릭 시
+// responseCode 의 가용 범위는 0 ~ 6
+message C_PlayerResponse{
+  int32 responseCode = 1;
+}
+
+// 전투 로그
+message BattleLog {
+  string msg = 1;
+  bool typingAnimation = 2;
+  repeated BtnInfo btns = 3; // Optional
+}

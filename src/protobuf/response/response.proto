@@ -12,3 +12,47 @@ message Response {
   int64 timestamp = 3;       // 메시지 생성 타임스탬프 (Unix 타임스탬프)
   bytes data = 4;            // 실제 응답 데이터 (선택적 필드)
 }
+
+// 던전 나가기
+message S_LeaveDungeon { }
+
+// 스크린 텍스트 내용 전송
+message S_ScreenText{
+  ScreenText screenText = 1;
+}
+
+// 스크린 텍스트 완료
+message S_ScreenDone { }
+
+// 전투 로그 전송
+message S_BattleLog {
+  BattleLog battleLog = 1;
+}
+
+// 플레이어의 체력
+message S_SetPlayerHp {
+  float hp = 1;
+}
+
+// 플레이어의 마나
+message S_SetPlayerMp {
+  float mp = 1;
+}
+
+// 몬스터의 체력
+message S_SetMonsterHp {
+  int32 monsterIdx = 1;
+  float hp = 2;
+}
+
+// 플레이어의 애니메이션 동작
+message S_PlayerAction {
+  int32 targetMonsterIdx = 1;
+  ActionSet actionSet = 2;
+}
+
+// 몬스터의 애니메이션 동작
+message S_MonsterAction {
+  int32 actionMonsterIdx = 1;
+  ActionSet actionSet = 2;
+}

@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+package custom;
+
+// 플레이어 정보
+message PlayerInfo {
+  int32 playerId = 1; // 서버 내부관리코드   
+  string nickname = 2;
+  int32 class = 3;
+
+  TransformInfo transform = 4;
+  StatInfo statInfo = 5;
+}
+
+// C_Enter 를 통해 입장했을때는 서버에서 랜덤 생성 
+// 기본값은 하단 밸류 참조
+// C_Move 를 통해 전달된 데이터는 다른 사용자에게 릴레이
+message TransformInfo {
+  float posX = 1; // 기본값 : -9 ~ 9
+  float posY = 2; // 기본값 : 1
+  float posZ = 3; // 기본값 : -8 ~ 8
+  float rot = 4; // 기본값 : 0~360
+}
+
+// 스텟 정보
+message StatInfo {
+  int32 level = 1;
+  float hp = 2;
+  float maxHp = 3;
+  float mp = 4;
+  float maxMp = 5;
+  float atk = 6;
+  float def = 7;
+  float magic = 8;
+  float speed = 9; 
+}
+
+// 스크린 텍스트
+message ScreenText{
+  string msg = 1;
+  bool typingAnimation = 2;
+  optional ScreenTextAlignment alignment = 3;
+  optional Color textColor = 4;
+  optional Color screenColor = 5;
+}
+
+// 스크린 텍스트 조정
+message ScreenTextAlignment {
+  int32 x = 1;
+  int32 y = 2;
+}
+
+// 색상
+message Color {
+  int32 r = 1;
+  int32 g = 2;
+  int32 b = 3;
+}
+
+// 던전 정보
+message DungeonInfo {
+  int32 dungeonCode = 1;
+  repeated MonsterStatus monsters = 2;
+}
+
+// 몬스터 상태
+message MonsterStatus {
+  int32 monsterIdx = 1;
+  int32 monsterModel = 2;
+  string monsterName = 3;
+  float monsterHp = 4;
+}
+
+// 애니메이션, 이펙트 코드
+message ActionSet {
+  int32 animCode = 1;
+  int32 effectCode = 2;
+}
+
+// 플레이어 스텟
+message PlayerStatus {
+  int32 playerClass = 1;
+  int32 playerLevel = 2;
+  string playerName = 3;
+  float playerFullHp = 4;
+  float playerFullMp = 5;
+  float playerCurHp = 6;
+  float playerCurMp = 7;
+}
+
+// 전투 로그
+message BattleLog {
+  string msg = 1;
+  bool typingAnimation = 2;
+  repeated BtnInfo btns = 3; // Optional
+}
+
+// 버튼 정보
+message BtnInfo {
+  string msg = 1;
+  bool enable = 2;
+}
